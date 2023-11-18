@@ -1,28 +1,51 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <button @click="generateVideo">Generate Video</button>
+    <div v-if="loading">Loading...</div>
+    <div v-if="videoUrl">
+      <video :src="videoUrl" controls></video>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import axios from "axios";
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  data() {
+    return {
+      loading: false,
+      videoUrl: null,
+    };
+  },
+  methods: {
+    async generateVideo() {
+      this.loading = true;
+
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/generate_video"
+        );
+        this.videoUrl = response.data.url;
+      } catch (error) {
+        console.error("Error generating video:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
+};
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
   margin-top: 60px;
+}
+
+video {
+  width: 100%;
+  max-width: 600px;
+  margin-top: 20px;
 }
 </style>
